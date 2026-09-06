@@ -7,20 +7,27 @@ import os
 load_dotenv()
 key=os.getenv("CURRENCY_API_KEY")
 gemini_model = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash"
+    model="gemini-3.6-flash"
 )
-@tool("currency_converter",description="Convert currency from Dollars to Tunisia Dinars",return_direct=False)
-def convert_currency():
-    API_URL="https://api.freecurrencyapi.com/v1/latest"
-    params={
-        "apikey":key
-        ,"base_currency":"USD"
-        ,"currencies":"TND"
-    }
-    response=requests.get(url=API_URL
+@tool("currency_converter",description="Convert currency from Dollars to EURO",return_direct=False)
+def convert_currency(amount:float)->str:
+    try:
+        API_URL="https://api.freecurrencyapi.com/v1/latest"
+        params={
+            "apikey":key
+            ,"base_currency":"USD"
+            ,"currencies":"EUR"
+        }
+        response=requests.get(url=API_URL
                           ,params=params
                           )
-    return response.json()
+        data=response.json()
+        print(data)
+        rate=data["data"]["EUR"]
+        converted=rate*amount
+        return f"{amount} in USD is equivalent to {converted} in EUR"
+    except Exception as e:
+        return f"Error fetching convertion is {e}"
 agent=create_agent(
     model=gemini_model
     ,tools=[convert_currency]
@@ -30,7 +37,8 @@ response=agent.invoke({
     "messages":[
         {
             "role":"user"
-            ,"content":"What is 100 dollars in TND"
+            ,"content":"What is 100 dollars in EURO"
         }
     ]
 })
+print(response["messages"][-1].content)
