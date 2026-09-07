@@ -2,12 +2,14 @@ import requests
 from dotenv import load_dotenv 
 from langchain.agents import create_agent
 from langchain.tools import tool
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_ollama import ChatOllama
 import os
 load_dotenv()
 key=os.getenv("CURRENCY_API_KEY")
-gemini_model = ChatGoogleGenerativeAI(
-    model="gemini-3.6-flash"
+ollama_model = ChatOllama(
+    model="llama3.1"
+    ,temperature=0
+
 )
 @tool("currency_converter",description="Convert currency from Dollars to EURO",return_direct=False)
 def convert_currency(amount:float)->str:
@@ -29,7 +31,7 @@ def convert_currency(amount:float)->str:
     except Exception as e:
         return f"Error fetching convertion is {e}"
 agent=create_agent(
-    model=gemini_model
+    model=ollama_model
     ,tools=[convert_currency]
     ,system_prompt="You are a helpful AI Assistant and your role is to give me the rate of converstion Be precise and remain helpful"
 )
@@ -40,5 +42,6 @@ response=agent.invoke({
             ,"content":"What is 100 dollars in EURO"
         }
     ]
+
 })
 print(response["messages"][-1].content)
