@@ -15,7 +15,6 @@ def get_weather(latitude:float,longitude:float)->float:
         ,"longitude":longitude
         ,"temperature_unit":"celsius"
         ,"current": "temperature_2m",
-
     }
     response=requests.get(url=weather_API_URL
                           ,params=params)
