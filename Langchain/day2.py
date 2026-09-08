@@ -70,7 +70,6 @@ def get_tourist_places(city: str):
     places = []
     for place in places_data.get("features", []):
         properties = place.get("properties", {})
-
         places.append({
             "name": properties.get("name"),
             "address": properties.get("formatted"),
